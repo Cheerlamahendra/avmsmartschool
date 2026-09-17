@@ -1,0 +1,1 @@
+import ModuleClient from '@/components/dashboard/ModuleClient'; export default async function Page({params}:{params:Promise<{module:string}>}){return <ModuleClient role="student" module={(await params).module}/>}

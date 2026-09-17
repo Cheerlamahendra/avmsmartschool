@@ -1,0 +1,8 @@
+import type { AttendanceStatus, Result } from '@/types';
+export function cn(...v:(string|false|undefined|null)[]){return v.filter(Boolean).join(' ')}
+export function formatDate(v:string){return new Intl.DateTimeFormat('en-IN',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(v))}
+export function attendancePercent(records:{status:AttendanceStatus}[]){if(!records.length)return 0; const good=records.filter(r=>r.status==='Present'||r.status==='Late').length; return Math.round((good/records.length)*100)}
+export function gradeFor(marks:number,max:number){const p=max?marks/max*100:0; if(p>=90)return'A+'; if(p>=80)return'A'; if(p>=70)return'B+'; if(p>=60)return'B'; if(p>=50)return'C'; if(p>=40)return'D'; return'F'}
+export function resultSummary(results:Result[]){const total=results.reduce((s,r)=>s+r.maximumMarks,0); const got=results.reduce((s,r)=>s+r.marksObtained,0); return {total,got,percentage:total?Math.round(got/total*100):0}}
+export function calcFeeStatus(amount:number,paid:number,due:string){const balance=Math.max(amount-paid,0); if(balance===0)return {balance,status:'Paid' as const}; if(paid>0)return {balance,status:'Partial' as const}; if(new Date(due)<new Date())return {balance,status:'Overdue' as const}; return {balance,status:'Pending' as const}}
+export function csvDownload(filename:string,rows:Record<string,unknown>[]){const headers=Object.keys(rows[0]||{}); const body=rows.map(r=>headers.map(h=>`"${String(r[h]??'').replaceAll('"','""')}"`).join(',')); const csv=[headers.join(','),...body].join('\n'); const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url)}
